@@ -1,0 +1,33 @@
+const mongoose = require('mongoose');
+
+const UserSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: true
+    },
+    email: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    password: {
+        type: String,
+        required: true
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    },
+    themePreference: {
+        type: String,
+        enum: ['light', 'dark', 'system'],
+        default: 'system'
+    },
+    fontSize: {
+        type: String,
+        enum: ['small', 'normal', 'large'],
+        default: 'normal'
+    }
+});
+
+module.exports = mongoose.model('User', UserSchema);
