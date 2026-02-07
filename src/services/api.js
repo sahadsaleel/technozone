@@ -1,37 +1,34 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Base URL configuration
-// For physical devices, use your computer's LAN IP
-// For Android Emulator, use http://10.0.2.2:5000/api
-// For iOS Simulator/Web, use http://localhost:5000/api
-
-// UPDATED PUBLIC IP: 223.181.12.52
-// NOTE: PORT FORWARDING (5000) MUST BE ENABLED ON ROUTER
-const BASE_URL = 'http://223.181.12.52:5000/api';
+// BASE_URL Configuration
+// For Local Development (Simulator): http://192.168.1.4:5000
+// For Production/APK (Public Tunnel): https://technozone-server.loca.lt (Example)
+// IMPORTANT: Update this URL after starting 'npm run tunnel'
+const BASE_URL = 'https://bitter-readers-cheat.loca.lt';
 
 const api = axios.create({
     baseURL: BASE_URL,
     headers: {
         'Content-Type': 'application/json',
-        // Bypass tunnel landing pages (localtunnel & ngrok)
         'bypass-tunnel-reminder': 'true',
         'ngrok-skip-browser-warning': 'true',
         'User-Agent': 'TechnoZone-App',
     },
-    timeout: 60000, // Increased to 60s for slow tunnels
+    timeout: 30000,
 });
 
-// Request Interceptor: Add JWT Token
+// Request Interceptor: Centralized URL handling
 api.interceptors.request.use(
     async (config) => {
         try {
-            const token = await AsyncStorage.getItem('userToken');
-            if (token) {
-                config.headers.Authorization = `Bearer ${token}`;
+            // Ensure all requests go through the /api prefix
+            if (!config.url.startsWith('/api')) {
+                config.url = `/api${config.url.startsWith('/') ? '' : '/'}${config.url}`;
             }
+
         } catch (error) {
-            console.error('Error retrieving token:', error);
+            console.error('Error in request interceptor:', error);
         }
         return config;
     },

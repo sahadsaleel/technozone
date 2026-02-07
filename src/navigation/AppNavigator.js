@@ -3,10 +3,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { View, ActivityIndicator } from 'react-native';
 
-import { AuthProvider, useAuth } from '../context/AuthContext';
 import { SalesProvider } from '../context/SalesContext';
 import HomeScreen from '../screens/HomeScreen';
-import LoginScreen from '../screens/auth/LoginScreen';
 import ProductListScreen from '../screens/products/ProductListScreen';
 import AddProductScreen from '../screens/products/AddProductScreen';
 import AddPurchaseScreen from '../screens/purchases/AddPurchaseScreen';
@@ -18,23 +16,13 @@ import SalesLedgerScreen from '../screens/sales/SalesLedgerScreen';
 import AddServiceSaleScreen from '../screens/services/AddServiceSaleScreen';
 import AddServiceExpenseScreen from '../screens/services/AddServiceExpenseScreen';
 
-import SignupScreen from '../screens/auth/SignupScreen';
-import SettingsScreen from '../screens/settings/SettingsScreen';
+import NewSettingsScreen from '../screens/settings/NewSettingsScreen';
 import { ThemeProvider, useTheme } from '../context/ThemeContext';
 
 const Stack = createStackNavigator();
 
 function AppStack() {
-    const { userToken, isLoading } = useAuth();
     const { theme } = useTheme();
-
-    if (isLoading) {
-        return (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: theme.colors.background }}>
-                <ActivityIndicator size="large" color={theme.colors.primary} />
-            </View>
-        );
-    }
 
     return (
         <Stack.Navigator
@@ -51,35 +39,11 @@ function AppStack() {
                 cardStyle: { backgroundColor: theme.colors.background }
             }}
         >
-            {userToken == null ? (
-                // No token found, user isn't signed in
-                <>
-                    <Stack.Screen
-                        name="Login"
-                        component={LoginScreen}
-                        options={{ headerShown: false }}
-                    />
-                    <Stack.Screen
-                        name="Signup"
-                        component={SignupScreen}
-                        options={{ headerShown: false }}
-                    />
-                </>
-            ) : (
-                // User is signed in
-                <>
-                    <Stack.Screen
-                        name="Home"
-                        component={HomeScreen}
-                        options={{ title: 'Dashboard' }}
-                    />
-                    <Stack.Screen
-                        name="Settings"
-                        component={SettingsScreen}
-                        options={{ title: 'Settings' }}
-                    />
-                </>
-            )}
+            <Stack.Screen
+                name="Home"
+                component={HomeScreen}
+                options={{ title: 'Dashboard' }}
+            />
             <Stack.Screen
                 name="ProductList"
                 component={ProductListScreen}
@@ -130,20 +94,23 @@ function AppStack() {
                 component={AddServiceExpenseScreen}
                 options={{ title: 'Add Service Expense' }}
             />
+            <Stack.Screen
+                name="Settings"
+                component={NewSettingsScreen}
+                options={{ title: 'Settings' }}
+            />
         </Stack.Navigator>
     );
 }
 
 export default function AppNavigator() {
     return (
-        <AuthProvider>
-            <SalesProvider>
-                <ThemeProvider>
-                    <NavigationContainer>
-                        <AppStack />
-                    </NavigationContainer>
-                </ThemeProvider>
-            </SalesProvider>
-        </AuthProvider>
+        <SalesProvider>
+            <ThemeProvider>
+                <NavigationContainer>
+                    <AppStack />
+                </NavigationContainer>
+            </ThemeProvider>
+        </SalesProvider>
     );
 }

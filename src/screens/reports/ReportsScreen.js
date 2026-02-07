@@ -82,7 +82,6 @@ const ReportsScreen = () => {
     };
 
     const downloadReport = async (filter, start = null, end = null) => {
-        console.log(`[Frontend] Download started: ${filter}`);
         setShowFilterModal(false);
         setIsCustomDate(false);
 
@@ -102,7 +101,6 @@ const ReportsScreen = () => {
                 params: params
             });
 
-            console.log(`[Frontend] URL: ${downloadUrl}`);
 
             const filename = `Report_${filter}_${Date.now()}.xlsx`;
             const fileUri = FileSystem.cacheDirectory + filename;
@@ -112,7 +110,6 @@ const ReportsScreen = () => {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
 
-            console.log(`[Frontend] Status: ${downloadRes.status}`);
 
             if (downloadRes.status !== 200) {
                 throw new Error(`Download failed with status ${downloadRes.status}`);
@@ -120,7 +117,6 @@ const ReportsScreen = () => {
 
             // Verify file status
             const info = await FileSystem.getInfoAsync(fileUri);
-            console.log('[Frontend] File Metadata:', JSON.stringify(info));
 
             if (!info.exists || info.size === 0) {
                 throw new Error('The downloaded file appears to be empty.');
@@ -133,7 +129,6 @@ const ReportsScreen = () => {
             setTimeout(async () => {
                 try {
                     if (await Sharing.isAvailableAsync()) {
-                        console.log('[Frontend] Showing share sheet...');
                         await Sharing.shareAsync(fileUri, {
                             mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
                             UTI: 'org.openxmlformats.spreadsheetml.sheet'

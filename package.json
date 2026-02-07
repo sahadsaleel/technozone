@@ -7,7 +7,8 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "dev": "cd server && npm run dev"
+    "dev": "cd server && npm run dev",
+    "tunnel": "npx localtunnel --port 5000"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^2.2.0",
@@ -15,7 +16,7 @@
     "@react-navigation/native": "^6.1.9",
     "@react-navigation/stack": "^6.3.20",
     "axios": "^1.13.3",
-    "expo": "^54.0.32",
+    "expo": "~54.0.33",
     "expo-document-picker": "~14.0.8",
     "expo-file-system": "~19.0.21",
     "expo-sharing": "~14.0.8",

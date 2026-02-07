@@ -11,13 +11,11 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
-import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import api from '../services/api';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default function HomeScreen({ navigation }) {
-    const { logout, userData } = useAuth();
     const { theme } = useTheme();
     const [summary, setSummary] = useState({
         totalSales: 0,
@@ -94,24 +92,12 @@ export default function HomeScreen({ navigation }) {
                     />
                 }
             >
-                {/* Header */}
                 <View style={[styles.header, { backgroundColor: theme.colors.background }]}>
                     <View style={styles.headerContent}>
                         <View>
                             <Text style={[styles.greeting, { color: theme.colors.textSecondary }]}>Good day</Text>
-                            <Text style={[styles.userName, { color: theme.colors.text }]}>{userData?.name || 'Shop Owner'}</Text>
+                            <Text style={[styles.userName, { color: theme.colors.text }]}>Shop Owner</Text>
                         </View>
-                        <TouchableOpacity
-                            onPress={() => {
-                                Alert.alert('Logout', 'Are you sure you want to logout?', [
-                                    { text: 'Cancel', style: 'cancel' },
-                                    { text: 'Logout', onPress: logout, style: 'destructive' }
-                                ]);
-                            }}
-                            style={styles.headerLogoutBtn}
-                        >
-                            <MaterialCommunityIcons name="logout" size={24} color={theme.colors.danger} />
-                        </TouchableOpacity>
                     </View>
                 </View>
 

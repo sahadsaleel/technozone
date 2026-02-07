@@ -3,6 +3,8 @@ const Product = require('../models/Product');
 const Expense = require('../models/Expense');
 const Sale = require('../models/Sale');
 const Purchase = require('../models/Purchase');
+const ServiceSale = require('../models/ServiceSale');
+const ServiceExpense = require('../models/ServiceExpense');
 const bcrypt = require('bcryptjs');
 
 // @desc    Get user profile
@@ -193,6 +195,28 @@ exports.importUserData = async (req, res) => {
         res.json({ message: 'Data imported successfully' });
     } catch (err) {
         console.error('Import Error:', err.message);
+        res.status(500).send('Server Error: ' + err.message);
+    }
+};
+
+// @desc    Delete all data
+// @route   DELETE /api/user/data
+// @access  Private
+exports.deleteAllData = async (req, res) => {
+    try {
+        // Clear all collections except Users
+        await Promise.all([
+            Product.deleteMany({}),
+            Expense.deleteMany({}),
+            Sale.deleteMany({}),
+            Purchase.deleteMany({}),
+            ServiceSale.deleteMany({}),
+            ServiceExpense.deleteMany({})
+        ]);
+
+        res.json({ message: 'All data has been cleared successfully' });
+    } catch (err) {
+        console.error('Delete All Data Error:', err.message);
         res.status(500).send('Server Error: ' + err.message);
     }
 };

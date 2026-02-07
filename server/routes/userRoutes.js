@@ -7,7 +7,8 @@ const {
     changePassword,
     deleteAccount,
     exportUserData,
-    importUserData
+    importUserData,
+    deleteAllData
 } = require('../controllers/userController');
 
 // All routes are protected
@@ -17,6 +18,7 @@ router.get('/profile', getUserProfile);
 router.put('/profile', updateUserProfile);
 router.put('/password', changePassword);
 router.delete('/account', deleteAccount);
+router.delete('/data', deleteAllData);
 router.get('/export', exportUserData);
 router.post('/import', importUserData);
 

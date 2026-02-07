@@ -16,6 +16,12 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
+
+// Ping endpoint for connectivity testing
+app.get('/api/ping', (req, res) => {
+    res.json({ message: 'pong', timestamp: new Date() });
+});
+
 // Routes
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/products', require('./routes/productRoutes'));

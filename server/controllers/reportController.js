@@ -99,7 +99,6 @@ exports.getSummary = async (req, res) => {
 };
 
 exports.downloadReport = async (req, res) => {
-    console.log('[Download] Generating premium report:', req.query);
     try {
         const { filter, startDate, endDate } = req.query;
         let start, end;
