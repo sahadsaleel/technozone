@@ -17,6 +17,17 @@ app.use(cors());
 app.use(express.json());
 
 
+// Health Check Endpoint (Critical for "Real World" monitoring)
+app.get('/api/health', (req, res) => {
+    const dbStatus = mongoose.connection.readyState === 1 ? 'connected' : 'disconnected';
+    res.json({
+        status: 'UP',
+        timestamp: new Date(),
+        database: dbStatus,
+        environment: process.env.NODE_ENV || 'development'
+    });
+});
+
 // Ping endpoint for connectivity testing
 app.get('/api/ping', (req, res) => {
     res.json({ message: 'pong', timestamp: new Date() });
@@ -46,21 +57,21 @@ app.use((err, req, res, next) => {
 // Database Connection and Server Start
 const startServer = async () => {
     try {
+        // Attempt to connect to MongoDB with a longer timeout
         await mongoose.connect(process.env.MONGO_URI, {
-            serverSelectionTimeoutMS: 5000
+            serverSelectionTimeoutMS: 10000 // 10 seconds
         });
         console.log('✅ MongoDB Connected Successfully');
-
-        app.listen(PORT, '0.0.0.0', () => {
-            console.log(`Server running on port ${PORT}`);
-        });
     } catch (err) {
         console.error('❌ MongoDB Connection Error:', err.message);
-        console.log('⚠️ Server starting without DB connection...');
-        app.listen(PORT, '0.0.0.0', () => {
-            console.log(`Server running on port ${PORT}`);
-        });
+        console.log('⚠️ Server starting in LIMITED MODE (No DB)...');
+        // We still start the server so the health check endpoint works!
     }
+
+    app.listen(PORT, '0.0.0.0', () => {
+        console.log(`🚀 Server running on port ${PORT}`);
+        console.log(`👉 Local: http://localhost:${PORT}`);
+    });
 };
 
 startServer();

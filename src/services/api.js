@@ -1,19 +1,33 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// BASE_URL Configuration
-// For Local Development (Simulator): http://192.168.1.4:5000
-// For Production/APK (Public Tunnel): https://technozone-server.loca.lt (Example)
-// IMPORTANT: Update this URL after starting 'npm run tunnel'
-const BASE_URL = 'https://bitter-readers-cheat.loca.lt';
+// =======================================================================
+// REAL WORLD APPLICATION CONFIGURATION
+// =======================================================================
+
+// 1. PRODUCTION_URL: This is your "Real World" hosted backend.
+//    - If you deploy to Render, verify the URL here.
+//    - Example: 'https://technozone-api.onrender.com'
+const PRODUCTION_URL = 'https://technozone-api.onrender.com'; // <--- UPDATE THIS WITH YOUR RENDER URL
+
+// 2. LOCAL_URL: For testing on your computer/simulator
+const LOCAL_URL = 'http://192.168.1.4:5000'; // Check your IP with 'ipconfig'
+
+// 3. USE_PRODUCTION: Set to true when building the APK for your phone!
+//    Set to false when just coding on your laptop.
+const USE_PRODUCTION = true;
+
+const BASE_URL = USE_PRODUCTION ? PRODUCTION_URL : LOCAL_URL;
+
+console.log(`🚀 API Initialized using: ${BASE_URL} (${USE_PRODUCTION ? 'Production' : 'Development'})`);
 
 const api = axios.create({
     baseURL: BASE_URL,
     headers: {
         'Content-Type': 'application/json',
-        'bypass-tunnel-reminder': 'true',
-        'ngrok-skip-browser-warning': 'true',
-        'User-Agent': 'TechnoZone-App',
+        'bypass-tunnel-reminder': 'true', // Needed for localtunnel
+        'ngrok-skip-browser-warning': 'true', // Needed for ngrok
+        'User-Agent': 'TechnoZone-App/1.0',
     },
     timeout: 30000,
 });
@@ -53,10 +67,25 @@ api.interceptors.response.use(
         }
 
         // Format error message for easier consumption in UI
-        const errorMessage =
-            error.response?.data?.message ||
-            error.message ||
-            'An unexpected error occurred';
+        let errorMessage = 'An unexpected error occurred';
+
+        if (!error.response) {
+            // Network error (no response received)
+            if (error.code === 'ECONNABORTED') {
+                errorMessage = 'Connection timed out. Please check your internet.';
+            } else {
+                errorMessage = 'Network Error: Cannot connect to server. Check your tunnel or internet connection.';
+            }
+        } else {
+            // Server responded with an error status
+            errorMessage = error.response.data?.message || `Server Error (${error.response.status})`;
+        }
+
+        console.error('API Error:', {
+            url: originalRequest?.url,
+            status: error.response?.status,
+            message: errorMessage
+        });
 
         // Attach formatted message to the error object
         error.formattedMessage = errorMessage;

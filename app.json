@@ -11,9 +11,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
     },
@@ -28,9 +26,7 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": [
-      "@react-native-community/datetimepicker"
-    ],
+    "plugins": ["@react-native-community/datetimepicker"],
     "extra": {
       "eas": {
         "projectId": "d0459ab2-c429-4d92-b332-e96eac9d7575"
