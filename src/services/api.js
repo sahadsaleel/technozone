@@ -29,7 +29,7 @@ const api = axios.create({
         'ngrok-skip-browser-warning': 'true', // Needed for ngrok
         'User-Agent': 'TechnoZone-App/1.0',
     },
-    timeout: 30000,
+    timeout: 60000, // Increased to 60s to handle Render free tier "cold starts"
 });
 
 // Request Interceptor: Centralized URL handling
