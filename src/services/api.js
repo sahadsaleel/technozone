@@ -5,88 +5,36 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 // REAL WORLD APPLICATION CONFIGURATION
 // =======================================================================
 
-// 1. PRODUCTION_URL: This is your "Real World" hosted backend.
-//    - If you deploy to Render, verify the URL here.
-//    - Example: 'https://technozone-api.onrender.com'
-const PRODUCTION_URL = 'https://technozone-api.onrender.com'; // <--- UPDATE THIS WITH YOUR RENDER URL
-
-// 2. LOCAL_URL: For testing on your computer/simulator
-const LOCAL_URL = 'http://192.168.1.4:5000'; // Check your IP with 'ipconfig'
-
-// 3. STORAGE_KEY: Key to save the custom URL
-export const STORAGE_KEY_URL = 'SERVER_URL';
-
-// 3. USE_PRODUCTION: Set to true when building the APK for your phone!
-//    Set to false when just coding on your laptop.
-const USE_PRODUCTION = false; // Default to false, will be overridden by AsyncStorage
-
-const DEFAULT_BASE_URL = USE_PRODUCTION ? PRODUCTION_URL : LOCAL_URL;
-
-console.log(`🚀 API Initializing... Default: ${DEFAULT_BASE_URL}`);
+// This is your live backend hosted on Render.
+// Every time you open the app, it will connect here automatically.
+const PRODUCTION_URL = 'https://technozone-api.onrender.com';
 
 const api = axios.create({
-    baseURL: DEFAULT_BASE_URL,
+    baseURL: PRODUCTION_URL,
     headers: {
         'Content-Type': 'application/json',
-        'bypass-tunnel-reminder': 'true', // Needed for localtunnel
-        'ngrok-skip-browser-warning': 'true', // Needed for ngrok
+        'bypass-tunnel-reminder': 'true',
+        'ngrok-skip-browser-warning': 'true',
         'User-Agent': 'TechnoZone-App/1.0',
     },
     timeout: 60000,
 });
 
-// Function to update the Base URL at runtime
-export const setApiBaseUrl = async (newUrl) => {
-    if (!newUrl) return;
-    try {
-        // Normalize URL: remove trailing slash
-        const normalizedUrl = newUrl.endsWith('/') ? newUrl.slice(0, -1) : newUrl;
-
-        api.defaults.baseURL = normalizedUrl;
-        await AsyncStorage.setItem(STORAGE_KEY_URL, normalizedUrl);
-        console.log(`✅ API Base URL updated to: ${normalizedUrl}`);
-        return true;
-    } catch (error) {
-        console.error('Failed to save Server URL:', error);
-        return false;
-    }
-};
-
-// Function to initialize the URL from storage
-export const initializeApi = async () => {
-    try {
-        const storedUrl = await AsyncStorage.getItem(STORAGE_KEY_URL);
-        if (storedUrl) {
-            api.defaults.baseURL = storedUrl;
-            console.log(`🔄 Restored API URL from storage: ${storedUrl}`);
-            return storedUrl;
-        }
-    } catch (error) {
-        console.error('Failed to load Server URL:', error);
-    }
-    return DEFAULT_BASE_URL;
-};
-
-// Auto-initialize (fire and forget)
-initializeApi();
-
 // Request Interceptor: Centralized URL handling
 api.interceptors.request.use(
     async (config) => {
         try {
-            // Ensure all requests go through the /api prefix
+            // Add the /api prefix automatically if not present
             if (!config.url.startsWith('/api')) {
                 config.url = `/api${config.url.startsWith('/') ? '' : '/'}${config.url}`;
             }
 
         } catch (error) {
-            console.error('Error in request interceptor:', error);
+            console.error('Request Error:', error);
         }
         return config;
     },
-    (error) => {
-        return Promise.reject(error);
-    }
+    (error) => Promise.reject(error)
 );
 
 // Response Interceptor: Handle Errors
